@@ -11,13 +11,14 @@
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { BUILDING, SITE_BOUNDS } from '../../config/layout';
+import { BUILDING, OVERVIEW_BOUNDS, SITE_BOUNDS } from '../../config/layout';
 import { useUI, type CameraRequest } from '../../state/uiStore';
 import { LIVE_CAMS, camState, navInput } from './cameraShared';
 
-const YAW = THREE.MathUtils.degToRad(24);
-const ELEVATION = THREE.MathUtils.degToRad(50);
-/** Default overview direction: from the front, a little to the right, 50° above the horizon. */
+const YAW = THREE.MathUtils.degToRad(14);
+const ELEVATION = THREE.MathUtils.degToRad(40);
+/** Default overview direction: from the front, a little to the right, 40° above the horizon —
+ *  steep enough to see into every cell, shallow enough that walls and machines show their height. */
 export const VIEW_DIR = new THREE.Vector3(
   Math.sin(YAW) * Math.cos(ELEVATION), Math.sin(ELEVATION), Math.cos(YAW) * Math.cos(ELEVATION),
 ).normalize();
@@ -68,12 +69,16 @@ function insideness(height: number) {
   return t * t * (3 - 2 * t);
 }
 
-/** Camera pose that frames the whole site along VIEW_DIR (perspective fit by bisection). */
+/** Screen area (NDC) the overview fills: clear of the toolbar on top and the hint bar below. */
+const FRAME = { left: -0.96, right: 0.96, bottom: -0.86, top: 0.72 };
+
+/** Camera pose that frames the whole hall along VIEW_DIR (perspective fit by bisection). */
 function overviewPose(aspect: number): Pose {
+  const B = OVERVIEW_BOUNDS;
   const cam = new THREE.PerspectiveCamera(FAR_FOV, aspect, 1, 3000);
-  const target = new THREE.Vector3((SITE_BOUNDS.minX + SITE_BOUNDS.maxX) / 2, 0, (SITE_BOUNDS.minZ + SITE_BOUNDS.maxZ) / 2);
+  const target = new THREE.Vector3((B.minX + B.maxX) / 2, 0, (B.minZ + B.maxZ) / 2);
   const corners: THREE.Vector3[] = [];
-  for (const x of [SITE_BOUNDS.minX, SITE_BOUNDS.maxX]) for (const z of [SITE_BOUNDS.minZ, SITE_BOUNDS.maxZ]) for (const y of [0, 6]) corners.push(new THREE.Vector3(x, y, z));
+  for (const x of [B.minX, B.maxX]) for (const z of [B.minZ, B.maxZ]) for (const y of [0, B.maxY]) corners.push(new THREE.Vector3(x, y, z));
   const extents = (d: number) => {
     cam.position.copy(target).addScaledVector(VIEW_DIR, d);
     cam.lookAt(target);
@@ -92,11 +97,13 @@ function overviewPose(aspect: number): Pose {
     for (let i = 0; i < 40; i++) {
       const mid = (lo + hi) / 2;
       const b = extents(mid);
-      if (b.min.x < -0.97 || b.max.x > 0.97 || b.min.y < -0.9 || b.max.y > 0.9) lo = mid; else hi = mid;
+      // Fits once both its width and height fit the frame (centring is fixed up below).
+      if (b.max.x - b.min.x > FRAME.right - FRAME.left || b.max.y - b.min.y > FRAME.top - FRAME.bottom) lo = mid; else hi = mid;
     }
     dist = hi;
     const b = extents(hi);
-    const c = b.getCenter(new THREE.Vector2());
+    // Shift so the box's centre lands on the frame's centre.
+    const c = b.getCenter(new THREE.Vector2()).sub(new THREE.Vector2((FRAME.left + FRAME.right) / 2, (FRAME.top + FRAME.bottom) / 2));
     const halfH = Math.tan(THREE.MathUtils.degToRad(FAR_FOV / 2)) * dist;
     const right = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 0);
     const upV = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 1);

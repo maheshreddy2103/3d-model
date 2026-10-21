@@ -8,8 +8,11 @@ export const BELT_Y = 0.85; // top of conveyor belts
 
 export const BUILDING = { minX: -54, maxX: 54, minZ: -24, maxZ: 28.5, backWallH: 8, lowWallH: 2.4 };
 
-/** Everything the overview camera has to fit: building, truck yard and docked trucks. */
+/** The whole site: building, truck yard and docked trucks (camera roaming limits, minimap). */
 export const SITE_BOUNDS = { minX: -70, maxX: 56, minZ: -25, maxZ: 29.5 };
+
+/** What the opening overview frames: the hall and its dock aprons, up to the roof trusses. */
+export const OVERVIEW_BOUNDS = { minX: -58, maxX: 54.5, minZ: -24.5, maxZ: 28.8, maxY: 9.8 };
 
 export type ZoneId = 'receiving' | 'machining' | 'assembly' | 'quality' | 'packaging' | 'dispatch';
 

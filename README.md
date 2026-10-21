@@ -35,6 +35,14 @@ No server, API keys or external assets are needed at runtime.
 
 ## Using it
 
+The opening view frames the whole hall from a 40° three-quarter angle, as a cutaway: the
+roof trusses stay over the back half, the front walls and columns are cut low. Everything
+runs at once: the main line (receiving → machining → assembly → test → packing), the rotor
+and stator preparation cells between the lines with AGVs carrying their output to assembly,
+raw material staged at the receiving dock, finished pallets staged for the trucks, forklifts,
+tugger trains and people at work. Production numbers sit in a slim strip at the bottom left
+(▴ expands the full set and the chart); clicking a machine opens its panel beside the view.
+
 ### Camera — eye view, game-style controls
 
 Every control is a drag, a click, the wheel or a key:
@@ -63,6 +71,7 @@ real time, and never affects production.
 | --- | --- |
 | Play / Pause / Reset / speed | Top bar (0.5×, 1×, 2×, 4×) |
 | Show / hide workers, labels, routes, quality lights, metrics | Toggle chips in the top bar |
+| See all production numbers and the throughput chart | ▴ on the metrics strip (▾ collapses it) |
 
 Labels get more detailed as you zoom in: zone names at overview, station names at area
 level, live operation and counts close up. Down on the floor only labels within 40 m show. Product serial tags appear when zoomed in with
@@ -133,12 +142,14 @@ src/
   scene/
     FactoryScene.tsx        Canvas, lights, simulation driver, scene assembly
     camera/                 Single camera rig (overview fit, dive-in blend, transitions) and live cams
-    environment/            Site, building shell, floor markings
+    environment/            Site, building shell, steel frame (columns, roof trusses, lamps, busbar), floor markings
     transport/              Conveyors, vehicles, live trucks/forklifts/pallets/AGV/walkers
     stations/               Station shell (select/focus/highlight/stack light) and all machine models
     actors/                 Robot arm (2-link IK programs), worker
     products/               Motor components and the instanced product renderer
-    props/                  Instanced racks and furniture, feeder cells, benches, offices
+    instanced.tsx           Batches static pieces into one InstancedMesh per shape and material
+    props/                  Racks and furniture, feeder cells, offices, rotor and stator prep cells with
+                            their AGVs, incoming/outbound staging, packaging supplies, utilities
     overlays/               Labels, flow routes, selected-product path
   ui/                       Toolbar, live-cam picker, controls help and LIVE tag, minimap, metrics, station and product panels
 ```
@@ -150,6 +161,7 @@ On slower graphics hardware open the app with `?lowgfx=1` (for example
 
 
 Repeated geometry is shared (unit boxes/cylinders scaled per mesh), static furniture is
-batched into one `InstancedMesh` per material, and every motor component is a single
+batched into one `InstancedMesh` per material (including the whole steel frame and the
+staging areas), and every motor component is a single
 `InstancedMesh` with a fixed slot per product. The simulation and the 3D loop never cause
 React re-renders; panels refresh four times a second.

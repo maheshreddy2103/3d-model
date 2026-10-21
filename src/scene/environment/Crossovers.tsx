@@ -30,9 +30,10 @@ function Bridge() {
             const z = side * (0.7 + (steps - i - 0.5) * 0.2);
             return <Box key={i} size={[1.1, 0.06, 0.22]} position={[0, h - 0.03, z]} mat={M.steel} />;
           })}
-          {[-0.55, 0.55].map((x) => (
-            <Box key={x} size={[0.05, 1.0, 2.4]} position={[x, DECK_Y * 0.5 + 0.55, side * 0.8]} rotation={[side * -0.5, 0, 0]} mat={M.hazard} cast={false} />
-          ))}
+          {/* Stair handrails: a top rail and a knee rail following the slope. */}
+          {[-0.55, 0.55].flatMap((x) => [0.95, 0.5].map((h) => (
+            <Box key={`${x}${h}`} size={[0.05, 0.05, 1.75]} position={[x, DECK_Y * 0.5 + h, side * 1.15]} rotation={[side * -0.7, 0, 0]} mat={M.hazard} cast={false} />
+          )))}
           {[-0.55, 0.55].map((x) => (
             <Box key={`p${x}`} size={[0.06, DECK_Y + 1.0, 0.06]} position={[x, (DECK_Y + 1.0) / 2, side * 0.7]} mat={M.darkSteel} />
           ))}

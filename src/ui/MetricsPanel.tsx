@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { engine } from '../sim/engineInstance';
 import { computeMetrics, formatDuration } from '../sim/metrics';
@@ -5,11 +6,29 @@ import { useUI } from '../state/uiStore';
 
 const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
 
+/**
+ * Production numbers, kept out of the factory's way: a slim strip of four headline figures,
+ * expandable to the full set and the throughput chart.
+ */
 export function MetricsPanel() {
   const show = useUI((s) => s.show.metrics);
+  const [open, setOpen] = useState(false);
   useUI((s) => s.tick);
   if (!show) return null;
   const m = computeMetrics(engine);
+
+  if (!open) {
+    return (
+      <section className="panel metrics-strip" aria-label="Production metrics">
+        <span><em>In production</em><strong>{m.inProduction}</strong></span>
+        <span><em>Completed</em><strong>{m.completed}</strong></span>
+        <span><em>Throughput</em><strong>{m.throughput.toFixed(0)}/h</strong></span>
+        <span><em>First-pass yield</em><strong>{pct(m.firstPassYield)}</strong></span>
+        <button type="button" className="icon" onClick={() => setOpen(true)} aria-label="Show all metrics" title="Show all metrics">▴</button>
+      </section>
+    );
+  }
+
   const data = engine.history.map((h) => ({ min: Math.round(h.t / 60), throughput: Math.round(h.throughput), wip: h.wip }));
 
   const tiles: [string, string, string?][] = [
@@ -25,6 +44,7 @@ export function MetricsPanel() {
 
   return (
     <section className="panel metrics" aria-label="Production metrics">
+      <button type="button" className="icon metrics-close" onClick={() => setOpen(false)} aria-label="Collapse metrics" title="Collapse">▾</button>
       <div className="kpis">
         {tiles.map(([label, value, sub]) => (
           <div className="kpi" key={label}>

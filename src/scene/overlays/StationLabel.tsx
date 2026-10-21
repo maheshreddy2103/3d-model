@@ -12,6 +12,8 @@ import { COLORS } from '../materials';
 
 /** Down on the floor, only labels within this distance are shown. */
 const NEAR_LABEL_DISTANCE = 40;
+/** Live details (operation, count) only for stations this close, so labels don't pile up. */
+const DETAIL_DISTANCE = 13;
 /** Below this camera height you are "inside" and far labels would crowd the view. */
 const INSIDE_HEIGHT = 12;
 
@@ -19,22 +21,25 @@ const INSIDE_HEIGHT = 12;
 function useLabelCulling(maxDistance: number, minCameraHeight = 0) {
   const anchor = useRef<THREE.Group>(null);
   const element = useRef<HTMLDivElement>(null);
+  const detail = useRef<HTMLDivElement>(null);
   const world = useRef(new THREE.Vector3());
   useFrame(({ camera }) => {
     if (!anchor.current || !element.current) return;
     anchor.current.getWorldPosition(world.current);
+    const distance = camera.position.distanceTo(world.current);
     const inside = camera.position.y < INSIDE_HEIGHT;
-    const far = inside && camera.position.distanceTo(world.current) > maxDistance;
+    const far = inside && distance > maxDistance;
     const low = camera.position.y < minCameraHeight;
     element.current.style.display = far || low ? 'none' : '';
+    if (detail.current) detail.current.style.display = distance > DETAIL_DISTANCE ? 'none' : '';
   });
-  return { anchor, element };
+  return { anchor, element, detail };
 }
 
 export function StationLabel({ def, height, offsetZ }: { def: StationDef; height: number; offsetZ: number }) {
   const show = useUI((s) => s.show.machineLabels);
   const tier = useUI((s) => s.zoomTier);
-  const { anchor, element } = useLabelCulling(NEAR_LABEL_DISTANCE);
+  const { anchor, element, detail } = useLabelCulling(NEAR_LABEL_DISTANCE);
   useUI((s) => s.tick);
   if (!show || tier === 0) return null;
   const info = stationInfo(def.id);
@@ -48,7 +53,7 @@ export function StationLabel({ def, height, offsetZ }: { def: StationDef; height
             {def.name}
           </div>
           {tier === 2 && (
-            <div className="label-detail">
+            <div ref={detail} className="label-detail">
               <div>{def.operation}</div>
               <div>{info.processed} processed · {info.busy ? 'running' : 'waiting'}</div>
             </div>

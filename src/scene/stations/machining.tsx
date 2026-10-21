@@ -110,8 +110,28 @@ function MachineEnclosure({ def, width, spindle }: ModelProps & { width: number;
       </group>
       <Box size={[0.6, 0.8, 0.15]} position={[width / 2 - 0.4, 1.45, front - S * 0.1]} mat={M.robotDark} />
       <Box size={[0.45, 0.35, 0.05]} position={[width / 2 - 0.4, 1.55, front - S * 0.18]} mat={M.screen} />
+      {/* Sloped hood over the door and the machine's name band. */}
+      <Box size={[width - 0.2, 0.06, 0.55]} position={[0, 2.22, front + S * 0.22]} rotation={[S * 0.5, 0, 0]} mat={M.machineBlue} />
+      <Box size={[1.2, 0.18, 0.02]} position={[width / 2 - 0.9, 2.05, front - S * 0.01]} mat={M.label} />
+      {/* Worktable with the casting on it, visible through the door window. */}
+      <Box size={[1.2, 0.12, 0.7]} position={[-0.35, 0.98, S * 2.85]} mat={M.darkSteel} />
+      <Cyl size={[0.2, 0.3, 0.2]} position={[-0.35, 1.2, S * 2.85]} mat={M.casting} />
+      {/* Tool changer drum on the far end, with tool holders round its rim. */}
+      <group position={[-width / 2 - 0.4, 0, S * 3.2]}>
+        <Box size={[0.7, 1.0, 0.9]} position={[0, 0.5, 0]} mat={M.machine} />
+        <Cyl size={[0.45, 0.9, 0.45]} position={[0, 1.55, 0]} mat={M.machineBlue} />
+        {Array.from({ length: 8 }, (_, i) => {
+          const a = (i / 8) * Math.PI * 2;
+          return <Cyl key={i} size={[0.05, 0.22, 0.05]} position={[Math.cos(a) * 0.47, 1.55, Math.sin(a) * 0.47]} mat={M.steel} low />;
+        })}
+      </group>
+      {/* Electrical cabinet on the back, with coolant lines running into the enclosure. */}
+      <Box size={[1.1, 2.1, 0.5]} position={[width / 2 - 0.7, 1.05, S * 4.45]} mat={M.machine} />
+      <Box size={[0.04, 0.3, 0.04]} position={[width / 2 - 0.3, 1.1, S * 4.72]} mat={M.darkSteel} />
+      <Cyl size={[0.04, 1.6, 0.04]} position={[width / 2 - 1.6, 1.2, S * 4.3]} mat={M.binGreen} />
       {/* Chip conveyor and coolant tank. */}
       <Box size={[0.6, 0.6, 1.4]} position={[width / 2 + 0.35, 0.3, S * 3.3]} mat={M.darkSteel} />
+      <Box size={[0.4, 0.5, 0.4]} position={[width / 2 + 0.35, 0.95, S * 3.9]} rotation={[S * 0.6, 0, 0]} mat={M.darkSteel} />
       <Box size={[0.7, 0.5, 0.6]} position={[width / 2 + 0.4, 0.25, S * 4.3]} mat={M.binGreen} />
       <RobotArm station={def.id} position={[0.3, 0, S * 1.05]}
         program={tendingProgram(S * Math.PI / 2, -S * Math.PI / 2, 1.05, 1.15)} idleYaw={S * Math.PI / 2} />

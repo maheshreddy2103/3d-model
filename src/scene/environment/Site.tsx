@@ -1,5 +1,6 @@
 // Ground, truck yard, car park and the cutaway factory building: floor slab,
-// a full-height back wall, low cut walls on the other three sides, and columns.
+// a full-height back wall and low cut walls on the other three sides (the steel frame
+// is in Structure.tsx).
 
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -19,7 +20,6 @@ export function Site() {
       <CarPark />
       <FloorSlab />
       <Walls />
-      <Columns />
     </group>
   );
 }
@@ -159,25 +159,4 @@ function Walls() {
       ))}
     </group>
   );
-}
-
-/** Steel columns along the back wall (the rest of the frame is cut away for the view). */
-function Columns() {
-  const positions = useMemo(() => {
-    const list: [number, number][] = [];
-    for (const x of [minX, -42, -30, -18, -6, 6, 18, 30, 42, maxX]) list.push([x, minZ + 0.45]);
-    return list;
-  }, []);
-  const ref = useRef<THREE.InstancedMesh>(null);
-  useLayoutEffect(() => {
-    const mesh = ref.current;
-    if (!mesh) return;
-    const m = new THREE.Matrix4();
-    positions.forEach(([x, z], i) => {
-      m.compose(new THREE.Vector3(x, backWallH / 2, z), new THREE.Quaternion(), new THREE.Vector3(0.45, backWallH, 0.45));
-      mesh.setMatrixAt(i, m);
-    });
-    mesh.instanceMatrix.needsUpdate = true;
-  }, [positions]);
-  return <instancedMesh ref={ref} args={[G.box, M.darkSteel, positions.length]} castShadow receiveShadow />;
 }

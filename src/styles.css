@@ -117,7 +117,12 @@ html, body, #root { margin: 0; height: 100%; overflow: hidden; background: #dde6
 /* ---- panels --------------------------------------------------------- */
 
 .panel { position: absolute; z-index: 40; background: var(--panel); border-radius: 10px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.16); backdrop-filter: blur(4px); }
-.metrics { left: 12px; bottom: 44px; width: 560px; max-width: calc(100% - 24px); padding: 10px 12px; display: grid; grid-template-columns: 1fr; gap: 6px; }
+.metrics-strip { left: 12px; bottom: 44px; display: flex; align-items: center; gap: 14px; padding: 6px 8px 6px 12px; max-width: calc(100% - 24px); }
+.metrics-strip > span { display: flex; flex-direction: column; line-height: 1.15; white-space: nowrap; }
+.metrics-strip em { font-style: normal; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.metrics-strip strong { font-size: 14px; font-variant-numeric: tabular-nums; }
+.metrics-close { position: absolute; top: 6px; right: 6px; }
+.metrics { left: 12px; bottom: 44px; width: 520px; max-width: calc(100% - 24px); padding: 10px 12px; display: grid; grid-template-columns: 1fr; gap: 6px; }
 .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px 10px; }
 .kpi { display: flex; flex-direction: column; min-width: 0; }
 .kpi span { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); white-space: nowrap; }
@@ -176,6 +181,7 @@ html, body, #root { margin: 0; height: 100%; overflow: hidden; background: #dde6
 
 @media (max-width: 900px) {
   .metrics { width: calc(100% - 24px); }
+  .metrics-strip > span:nth-child(n+3) { display: none; }
   .kpis { grid-template-columns: repeat(2, 1fr); }
   .side { top: auto; height: 50%; width: calc(100% - 24px); }
   .hint { display: none; }

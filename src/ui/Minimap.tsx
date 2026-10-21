@@ -6,7 +6,7 @@ import { BUILDING, LANES, SITE_BOUNDS, ZONES } from '../config/layout';
 import { camState } from '../scene/camera/cameraShared';
 import { useUI } from '../state/uiStore';
 
-const W = 230;
+const W = 180;
 const PAD = 6;
 const MIN_X = SITE_BOUNDS.minX - 4;
 const MAX_X = SITE_BOUNDS.maxX + 2;

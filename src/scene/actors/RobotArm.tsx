@@ -134,15 +134,25 @@ export function RobotArm({ station, program, position, scale = 1, idleYaw = 0, s
   return (
     <group position={position} scale={scale}>
       <Box size={[0.9, 0.08, 0.9]} position={[0, 0.04, 0]} mat={M.hazard} />
-      <Cyl size={[0.34, 0.3, 0.34]} position={[0, 0.23, 0]} mat={M.robotDark} />
+      <Box size={[0.62, 0.14, 0.62]} position={[0, 0.15, 0]} mat={M.robotDark} />
+      <Cyl size={[0.34, 0.18, 0.34]} position={[0, 0.3, 0]} mat={M.robotDark} />
       <group ref={turret} position={[0, 0.38, 0]}>
-        <Cyl size={[0.28, 0.32, 0.28]} position={[0, 0.16, 0]} mat={M.robot} />
+        <Cyl size={[0.3, 0.3, 0.3]} position={[0, 0.15, 0]} mat={M.robot} />
+        <Box size={[0.3, 0.36, 0.5]} position={[-0.05, 0.35, 0]} mat={M.robot} />
+        {/* J2 motor on the side of the shoulder. */}
+        <Cyl size={[0.11, 0.18, 0.11]} position={[-0.08, SHOULDER_Y - 0.38, 0.33]} rotation={[Math.PI / 2, 0, 0]} mat={M.robotDark} />
         <group ref={upper} position={[0, SHOULDER_Y - 0.38, 0]}>
-          <Cyl size={[0.17, 0.36, 0.17]} rotation={[Math.PI / 2, 0, 0]} mat={M.robotDark} />
-          <Box size={[L1, 0.2, 0.22]} position={[L1 / 2, 0, 0]} mat={M.robot} />
+          <Cyl size={[0.19, 0.44, 0.19]} rotation={[Math.PI / 2, 0, 0]} mat={M.robot} />
+          <Box size={[L1, 0.22, 0.24]} position={[L1 / 2, 0, 0]} mat={M.robot} />
+          <Box size={[L1 * 0.7, 0.05, 0.26]} position={[L1 * 0.45, 0.12, 0]} mat={M.robotDark} />
+          {/* Cable dress along the upper arm. */}
+          <Cyl size={[0.03, L1, 0.03]} position={[L1 / 2, 0.16, -0.1]} rotation={[0, 0, Math.PI / 2]} mat={M.black} low />
           <group ref={fore} position={[L1, 0, 0]}>
-            <Cyl size={[0.13, 0.3, 0.13]} rotation={[Math.PI / 2, 0, 0]} mat={M.robotDark} />
-            <Box size={[L2, 0.15, 0.16]} position={[L2 / 2, 0, 0]} mat={M.robot} />
+            <Cyl size={[0.15, 0.34, 0.15]} rotation={[Math.PI / 2, 0, 0]} mat={M.robot} />
+            {/* J3/J4 motors as a counterweight behind the elbow. */}
+            <Box size={[0.3, 0.2, 0.2]} position={[-0.2, 0.02, 0]} mat={M.robotDark} />
+            <Box size={[L2, 0.16, 0.17]} position={[L2 / 2, 0, 0]} mat={M.robot} />
+            <Cyl size={[0.075, L2 * 0.5, 0.075]} position={[L2 * 0.72, 0, 0]} rotation={[0, 0, Math.PI / 2]} mat={M.robot} />
             <group ref={wrist} position={[L2, 0, 0]}>
               <Cyl size={[0.08, 0.18, 0.08]} position={[0.09, 0, 0]} rotation={[0, 0, Math.PI / 2]} mat={M.robotDark} />
               <Box size={[0.06, 0.06, 0.2]} position={[0.22, 0, 0]} mat={M.darkSteel} />

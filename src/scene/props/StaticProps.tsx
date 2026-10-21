@@ -2,14 +2,9 @@
 // carton stacks. Hundreds of pieces, so they are collected into one InstancedMesh per
 // (shape, material) instead of one mesh each.
 
-import { useLayoutEffect, useMemo, useRef } from 'react';
-import * as THREE from 'three';
+import { useMemo } from 'react';
 import { BUILDING, RACK_BAYS, RACK_ROW_Z } from '../../config/layout';
-import { G, M } from '../materials';
-
-type MatKey = keyof typeof M;
-type V3 = [number, number, number];
-interface Piece { shape: 'box' | 'cyl'; mat: MatKey; size: V3; pos: V3; rotX?: number; rotZ?: number }
+import { Pieces, type MatKey, type Piece, type V3 } from '../instanced';
 
 /** Pallet-rack bays along x. `load(bay, level)` returns pieces relative to the bay's shelf centre. */
 function rack(out: Piece[], opts: {
@@ -94,41 +89,6 @@ function buildPieces(): Piece[] {
 }
 
 export function StaticProps() {
-  const groups = useMemo(() => {
-    const map = new Map<string, Piece[]>();
-    for (const p of buildPieces()) {
-      const key = `${p.shape}:${p.mat}`;
-      const list = map.get(key) ?? [];
-      list.push(p);
-      map.set(key, list);
-    }
-    return [...map.entries()];
-  }, []);
-  return (
-    <group>
-      {groups.map(([key, pieces]) => <PieceBatch key={key} pieces={pieces} />)}
-    </group>
-  );
-}
-
-function PieceBatch({ pieces }: { pieces: Piece[] }) {
-  const ref = useRef<THREE.InstancedMesh>(null);
-  const { shape, mat } = pieces[0];
-  useLayoutEffect(() => {
-    const mesh = ref.current;
-    if (!mesh) return;
-    const m = new THREE.Matrix4();
-    const q = new THREE.Quaternion();
-    const e = new THREE.Euler();
-    pieces.forEach((p, i) => {
-      q.setFromEuler(e.set(p.rotX ?? 0, 0, p.rotZ ?? 0));
-      m.compose(new THREE.Vector3(...p.pos), q, new THREE.Vector3(...p.size));
-      mesh.setMatrixAt(i, m);
-    });
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.computeBoundingSphere();
-  }, [pieces]);
-  const geometry = shape === 'box' ? G.box : G.cyl;
-  const transparent = mat === 'glass';
-  return <instancedMesh ref={ref} args={[geometry, M[mat], pieces.length]} castShadow={!transparent} receiveShadow />;
+  const pieces = useMemo(buildPieces, []);
+  return <Pieces pieces={pieces} />;
 }

@@ -1,5 +1,6 @@
-// Belt conveyors for every lane, built from the lane polylines. Belt textures scroll
-// with simulated time, so the belts visibly run while the simulation plays.
+// Conveyors for every lane, built from the lane polylines. The main line is a belt whose
+// texture scrolls with simulated time, so it visibly runs while the simulation plays; the
+// rework and scrap lanes are roller conveyors. Gear motors drive each belt section.
 
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -24,6 +25,8 @@ export function Conveyors() {
     <group>
       {(Object.keys(LANES) as LaneId[]).map((id) => <Lane key={id} id={id} />)}
       <Legs />
+      <Rollers />
+      <DriveUnits />
       <Transfers />
     </group>
   );
@@ -52,7 +55,7 @@ function Lane({ id }: { id: LaneId }) {
         const cz = (seg.a[1] + seg.b[1]) / 2;
         return (
           <group key={seg.start} position={[cx, 0, cz]} rotation={[0, yawOf(seg.dx, seg.dz), 0]}>
-            <mesh geometry={G.box} material={material} scale={[len, 0.06, BELT_W]} position={[0, BELT_Y - 0.03, 0]} receiveShadow />
+            {id === 'main' && <mesh geometry={G.box} material={material} scale={[len, 0.06, BELT_W]} position={[0, BELT_Y - 0.03, 0]} receiveShadow />}
             <Box size={[len, 0.22, BELT_W + 0.12]} position={[0, BELT_Y - 0.17, 0]} mat={style.frame} />
             <Box size={[len, 0.07, 0.05]} position={[0, BELT_Y + 0.03, BELT_W / 2 + 0.05]} mat={M.steel} />
             <Box size={[len, 0.07, 0.05]} position={[0, BELT_Y + 0.03, -BELT_W / 2 - 0.05]} mat={M.steel} />
@@ -93,6 +96,55 @@ function Legs() {
     mesh.instanceMatrix.needsUpdate = true;
   }, [legs]);
   return <instancedMesh ref={ref} args={[G.box, M.darkSteel, legs.length]} castShadow />;
+}
+
+/** Rollers across the rework and scrap lanes (they have no belt), instanced. */
+function Rollers() {
+  const rollers = useMemo(() => {
+    const out: THREE.Matrix4[] = [];
+    const scale = new THREE.Vector3(0.055, BELT_W, 0.055);
+    for (const id of ['rework', 'scrap'] as LaneId[]) {
+      for (const seg of LANES[id].segments) {
+        // Roller axis lies across the lane: rotate the unit cylinder (axis y) onto the normal.
+        const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(-seg.dz, 0, seg.dx));
+        for (let t = 0.1; t <= seg.length; t += 0.2) {
+          const p = new THREE.Vector3(seg.a[0] + seg.dx * t, BELT_Y - 0.055, seg.a[1] + seg.dz * t);
+          out.push(new THREE.Matrix4().compose(p, q, scale));
+        }
+      }
+    }
+    return out;
+  }, []);
+  const ref = useRef<THREE.InstancedMesh>(null);
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    rollers.forEach((m, i) => mesh.setMatrixAt(i, m));
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+  }, [rollers]);
+  return <instancedMesh ref={ref} args={[G.cylLow, M.roller, rollers.length]} receiveShadow />;
+}
+
+/** Gear motor under the frame at the start of every belt section and every ~12 m along it. */
+function DriveUnits() {
+  const units = useMemo(() => {
+    const out: { x: number; z: number; yaw: number }[] = [];
+    for (const seg of LANES.main.segments) {
+      for (let t = 0.8; t < seg.length; t += 12) out.push({ x: seg.a[0] + seg.dx * t, z: seg.a[1] + seg.dz * t, yaw: yawOf(seg.dx, seg.dz) });
+    }
+    return out;
+  }, []);
+  return (
+    <group>
+      {units.map((u, i) => (
+        <group key={i} position={[u.x, 0, u.z]} rotation={[0, u.yaw, 0]}>
+          <Box size={[0.32, 0.26, 0.3]} position={[0, BELT_Y - 0.42, -BELT_W / 2 - 0.2]} mat={M.machineBlue} />
+          <Cyl size={[0.11, 0.3, 0.11]} position={[0, BELT_Y - 0.42, -BELT_W / 2 - 0.5]} rotation={[Math.PI / 2, 0, 0]} mat={M.darkSteel} />
+        </group>
+      ))}
+    </group>
+  );
 }
 
 /** Diverter turntable where failed motors leave the line, and the merge unit where they return. */

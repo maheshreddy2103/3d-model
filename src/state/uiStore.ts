@@ -79,3 +79,6 @@ export const useUI = create<UIState>((set) => ({
   bumpTick: () => set((s) => ({ tick: s.tick + 1 })),
   markReset: () => set((s) => ({ resetCount: s.resetCount + 1, selection: null })),
 }));
+
+// Development builds expose the store so automated checks can drive the camera and panels.
+if (import.meta.env.DEV) (window as unknown as { __ui: typeof useUI }).__ui = useUI;

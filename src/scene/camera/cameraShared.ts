@@ -16,9 +16,9 @@ export interface LiveCam {
 /** Eye-level viewpoints inside each area, like fixed cameras on the shop floor. */
 export const LIVE_CAMS: LiveCam[] = [
   { id: 'receiving', label: 'Receiving dock', pos: [-36, 2.8, -5], target: [-46, 1.2, -15] },
-  { id: 'machining', label: 'Machining line', pos: [-6, 2.6, -5.5], target: [-16, 1.2, -14] },
+  { id: 'machining', label: 'Machining line', pos: [-2, 3.4, -2.2], target: [-14, 1.2, -13] },
   { id: 'assembly', label: 'Assembly line', pos: [33, 2.4, -4], target: [24, 1.2, -12] },
-  { id: 'quality', label: 'Test cells', pos: [31, 2.6, 7.5], target: [22, 1.3, 14.5] },
+  { id: 'quality', label: 'Test cells', pos: [37, 4.8, 25], target: [24, 0.8, 15] },
   { id: 'packaging', label: 'Packing & palletising', pos: [-3, 2.8, 9], target: [-13, 1.2, 16] },
   { id: 'dispatch', label: 'Dispatch dock', pos: [-38, 3.2, 15.5], target: [-53, 1.2, 12] },
 ];

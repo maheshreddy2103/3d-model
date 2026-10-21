@@ -8,11 +8,14 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { CameraRig, FOV, VIEW_DIR } from './camera/CameraRig';
 import { Crossovers } from './environment/Crossovers';
 import { Site } from './environment/Site';
+import { Structure } from './environment/Structure';
 import { FloorMarkings } from './environment/FloorMarkings';
 import { Conveyors } from './transport/Conveyors';
 import { Stations } from './stations/Stations';
 import { StaticProps } from './props/StaticProps';
 import { DecorEquipment } from './props/DecorEquipment';
+import { PrepCells } from './props/PrepCells';
+import { Staging } from './props/Staging';
 import { Transport } from './transport/Transport';
 import { ZoneLabels } from './overlays/StationLabel';
 import { Products } from './products/Products';
@@ -34,16 +37,21 @@ export function FactoryScene() {
     >
       <SimDriver />
       <color attach="background" args={['#dde6eb']} />
+      {/* Light haze far out, so the land around the hall fades and the factory stands forward. */}
+      <fog attach="fog" args={['#dde6eb', 260, 900]} />
       <SceneEnvironment />
       <Lights />
       <CameraRig />
       <Site />
+      <Structure />
       <FloorMarkings />
       <Conveyors />
       <Crossovers />
       <Stations />
       <StaticProps />
       <DecorEquipment />
+      <PrepCells />
+      <Staging />
       <Transport />
       <Products />
       <Routes />
@@ -70,6 +78,8 @@ function SceneEnvironment() {
   const gl = useThree((s) => s.gl);
   const scene = useThree((s) => s.scene);
   useEffect(() => {
+    // Development builds expose the renderer so automated checks can read draw-call counts.
+    if (import.meta.env.DEV) (window as unknown as { __gl: typeof gl }).__gl = gl;
     const pmrem = new THREE.PMREMGenerator(gl);
     const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     scene.environment = env;
