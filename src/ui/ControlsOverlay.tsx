@@ -33,12 +33,14 @@ function WalkPad() {
 }
 
 const HELP: [string, string][] = [
-  ['Left-drag', 'Rotate the factory. Inside, it turns your head to look around.'],
-  ['Right-drag / middle-drag', 'Slide across the floor. Inside, it moves you sideways and forward.'],
-  ['Wheel up', 'Zoom in toward the pointer. Once inside, it keeps walking you forward toward where you point.'],
-  ['Wheel down', 'Zoom back out, all the way to the whole miniature.'],
-  ['▲ ▼ ◀ ▶ (inside)', 'Hold to walk forward / back or turn left / right.'],
-  ['Click', 'Select a station or motor'],
+  ['Click', 'Walk there at eye level. Click a machine to stop in front of it, facing it (and select it).'],
+  ['Left-drag', 'Move: drag the floor and the view slides with it. It never turns.'],
+  ['Right-drag / Shift-drag', 'Turn your head where you stand. It never moves.'],
+  ['Wheel', 'Fly toward whatever is under the pointer; wheel back to rise and see the whole factory.'],
+  ['W A S D', 'Walk forward / back, step left / right.'],
+  ['Arrows / on-screen pad', 'Walk forward / back, turn left / right.'],
+  ['Q / E', 'Go down / up.'],
+  ['Two fingers (touch)', 'Slide to look around, pinch to fly in or out.'],
   ['Double-click', 'Go close to the station or motor'],
   ['● Live cams', 'Jump to an eye-level view inside each area'],
   ['⌂ Factory overview', 'Back to the whole factory'],
@@ -70,8 +72,8 @@ export function ControlsOverlay() {
       <div className="controls-bar">
         <span className="mode-tag">{live ? 'Inside' : 'Miniature'}</span>
         <span>{live
-          ? 'Wheel up walks toward the pointer · wheel down zooms out · drag to look around · right-drag to step aside · hold the arrows to walk'
-          : 'Drag to rotate · right-drag to move · wheel to zoom — keep zooming in to stand inside · double-click a machine to go close'}</span>
+          ? 'Click to walk there · drag to move · right-drag to look around · wheel to fly · W A S D to walk'
+          : 'Click to go there · drag to move · right-drag to look around · wheel to fly in or out'}</span>
       </div>
       {helpOpen && (
         <section className="panel help" aria-label="Camera controls">
@@ -84,7 +86,7 @@ export function ControlsOverlay() {
               {HELP.map(([k, v]) => <tr key={k}><td className="key">{k}</td><td>{v}</td></tr>)}
             </tbody>
           </table>
-          <p className="muted small-note">One camera, mouse only. Production keeps running whatever you do with the view.</p>
+          <p className="muted small-note">One free camera: mouse, touch or keyboard. Production keeps running whatever you do with the view.</p>
         </section>
       )}
     </>

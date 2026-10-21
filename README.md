@@ -35,21 +35,23 @@ No server, API keys or external assets are needed at runtime.
 
 ## Using it
 
-### Camera — one camera, mouse only
+### Camera — eye view, game-style controls
 
-There are no separate modes. Treat the factory like a miniature you can hold and walk into:
+Each input does one thing only:
 
-| Mouse | Far out (the miniature) | Zoomed right in (on the floor) |
-| --- | --- | --- |
-| Left-drag | Rotate the whole factory 360° | Turn your head and look around |
-| Right-drag / middle-drag | Slide the view across the site | Walk along the aisles |
-| Wheel | Zoom toward the cursor | Keep zooming to step in closer |
-| Click / double-click | Select / go close to a station or motor | same |
+| Input | What it does |
+| --- | --- |
+| Click | Walk there at eye level; click a machine to stop in front of it, facing it |
+| Left-drag | Move — drag the floor and the view slides with it (never turns) |
+| Right-drag / Shift-drag | Turn your head where you stand (never moves) |
+| Wheel | Fly toward whatever is under the pointer; wheel back to rise over the whole factory |
+| W A S D / arrows, Q / E | Walk and step sideways / turn, go down / up |
+| Two fingers (touch) | Slide to look around, pinch to fly in or out |
+| Double-click | Go close to a station or motor |
 
-As you zoom in, the view blends smoothly from the 35° "model" lens to a 65° eye-level lens,
-the point you orbit rises to 1.5 m, and the camera eases toward a horizontal, standing view.
-A **● LIVE** tag shows the area you are standing in. Zoom out to get the miniature back, or
-press **⌂ Factory overview**. **● Live cams** jumps to eye-level views of receiving,
+Nothing tilts or moves on its own. The lens blends from a 35° "model" view high up to a 65°
+eye-level view near the floor, and a **● LIVE** tag shows the area you are standing in.
+**⌂ Factory overview** brings the whole factory back, and **● Live cams** jumps to eye-level views of receiving,
 machining, assembly, the test cells, packing and the dispatch dock. The minimap (bottom right)
 shows where you are; click it to move there, or drag on it to slide the view around. The camera never goes below the floor, runs on
 real time, and never affects production.
