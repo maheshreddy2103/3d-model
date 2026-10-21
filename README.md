@@ -37,16 +37,17 @@ No server, API keys or external assets are needed at runtime.
 
 ### Camera — eye view, game-style controls
 
-Each input does one thing only:
+Every control is a drag, a click, the wheel or a key:
 
 | Input | What it does |
 | --- | --- |
 | Click | Walk there at eye level; click a machine to stop in front of it, facing it |
-| Left-drag | Move — drag the floor and the view slides with it (never turns) |
-| Right-drag / Shift-drag | Turn your head where you stand (never moves) |
+| Left-drag | Rotate and move in one drag: left/right turns you, up/down walks you forward/back |
+| Right-drag | Look around freely (up, down, all the way round) where you stand |
+| Middle-drag / Shift-drag | Slide — drag the floor and the view slides with it |
 | Wheel | Fly toward whatever is under the pointer; wheel back to rise over the whole factory |
 | W A S D / arrows, Q / E | Walk and step sideways / turn, go down / up |
-| Two fingers (touch) | Slide to look around, pinch to fly in or out |
+| Touch | One finger turns and walks like left-drag; two fingers slide and pinch to fly in or out |
 | Double-click | Go close to a station or motor |
 
 Nothing tilts or moves on its own. The lens blends from a 35° "model" view high up to a 65°

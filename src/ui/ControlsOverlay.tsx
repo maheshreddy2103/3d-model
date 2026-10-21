@@ -34,13 +34,14 @@ function WalkPad() {
 
 const HELP: [string, string][] = [
   ['Click', 'Walk there at eye level. Click a machine to stop in front of it, facing it (and select it).'],
-  ['Left-drag', 'Move: drag the floor and the view slides with it. It never turns.'],
-  ['Right-drag / Shift-drag', 'Turn your head where you stand. It never moves.'],
+  ['Left-drag', 'Rotate and move in one drag: left / right turns you, up / down walks you forward / back.'],
+  ['Right-drag', 'Look around freely — up, down and all the way round — where you stand.'],
+  ['Middle-drag / Shift-drag', 'Slide: drag the floor and the view slides with it.'],
   ['Wheel', 'Fly toward whatever is under the pointer; wheel back to rise and see the whole factory.'],
   ['W A S D', 'Walk forward / back, step left / right.'],
   ['Arrows / on-screen pad', 'Walk forward / back, turn left / right.'],
   ['Q / E', 'Go down / up.'],
-  ['Two fingers (touch)', 'Slide to look around, pinch to fly in or out.'],
+  ['One finger / two fingers (touch)', 'One finger turns and walks like left-drag; two fingers slide and pinch to fly in or out.'],
   ['Double-click', 'Go close to the station or motor'],
   ['● Live cams', 'Jump to an eye-level view inside each area'],
   ['⌂ Factory overview', 'Back to the whole factory'],
@@ -72,8 +73,8 @@ export function ControlsOverlay() {
       <div className="controls-bar">
         <span className="mode-tag">{live ? 'Inside' : 'Miniature'}</span>
         <span>{live
-          ? 'Click to walk there · drag to move · right-drag to look around · wheel to fly · W A S D to walk'
-          : 'Click to go there · drag to move · right-drag to look around · wheel to fly in or out'}</span>
+          ? 'Drag ←→ to turn, ↑↓ to walk · click to walk there · right-drag to look around · wheel to fly'
+          : 'Drag ←→ to turn, ↑↓ to move · click to go there · right-drag to look around · wheel to fly in or out'}</span>
       </div>
       {helpOpen && (
         <section className="panel help" aria-label="Camera controls">

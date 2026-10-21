@@ -1,7 +1,8 @@
-// One eye-view camera, game style. Each input does one thing only:
+// One eye-view camera, game style:
 //   - click: walk there at eye level (click a machine and you stop in front of it, facing it),
-//   - left-drag: move — drag the floor and the view slides with it, no turning,
-//   - right-drag (or Shift-drag): turn your head where you stand, no moving,
+//   - left-drag: rotate and move in one drag — left/right turns you, up/down walks you forward/back,
+//   - right-drag: look around freely (up, down, all the way round) where you stand,
+//   - middle-drag (or Shift-drag): slide — drag the floor and the view slides with it, no turning,
 //   - wheel: fly toward (or away from) whatever is under the pointer — up to the whole factory,
 //   - W A S D: walk and step sideways, arrows: walk and turn, Q / E: down and up.
 // Nothing tilts or moves on its own. The lens widens from a 35° "model" view high up to a
@@ -53,7 +54,7 @@ const FLOOR = new THREE.Plane(UP, 0);
 interface Pose { pos: THREE.Vector3; target: THREE.Vector3 }
 interface Transition { fromPos: THREE.Vector3; fromQ: THREE.Quaternion; toPos: THREE.Vector3; toQ: THREE.Quaternion; t: number; duration: number }
 interface Drag {
-  mode: 'move' | 'look' | 'pinch';
+  mode: 'drive' | 'move' | 'look' | 'pinch';
   /** Floor point held under the pointer while moving (null: move at a steady pace instead). */
   grab: THREE.Vector3 | null;
   x: number; y: number; startX: number; startY: number; startTime: number;
@@ -236,6 +237,17 @@ export function CameraRig() {
       applyAngles();
     };
 
+    /** One drag, both at once: sideways turns you, up/down walks you forward/back. */
+    const drive = (dx: number, dy: number) => {
+      yaw.current -= dx * LOOK_SPEED;
+      applyAngles();
+      const depth = Math.max(15, camera.position.y * 1.5);
+      const k = (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * depth) / el.clientHeight;
+      const ahead = new THREE.Vector3(-Math.sin(yaw.current), 0, -Math.cos(yaw.current));
+      camera.position.addScaledVector(ahead, -dy * k);
+      clampPosition();
+    };
+
     /** Drag the floor: the floor point you grabbed follows the pointer. */
     const move = (d: Drag, x: number, y: number, dx: number, dy: number) => {
       raycaster.setFromCamera(ndc(x, y), camera);
@@ -277,11 +289,13 @@ export function CameraRig() {
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       const two = pointers.size === 2;
       const m = two ? midpoint() : { x: e.clientX, y: e.clientY, spread: 0 };
-      const lookMode = e.button === 1 || e.button === 2 || e.shiftKey || e.ctrlKey || e.metaKey;
+      const mode: Drag['mode'] = two ? 'pinch'
+        : e.button === 2 ? 'look'
+        : e.button === 1 || e.shiftKey || e.ctrlKey || e.metaKey ? 'move' : 'drive';
       raycaster.setFromCamera(ndc(m.x, m.y), camera);
       const floor = raycaster.ray.intersectPlane(FLOOR, new THREE.Vector3());
       drag = {
-        mode: two ? 'pinch' : lookMode ? 'look' : 'move',
+        mode,
         grab: floor && raycaster.ray.direction.y < -GRAB_STEEPNESS ? floor : null,
         x: m.x, y: m.y, startX: m.x, startY: m.y, startTime: performance.now(), spread: m.spread, moved: two,
       };
@@ -297,12 +311,13 @@ export function CameraRig() {
       d.moved = true;
       const dx = m.x - d.x;
       const dy = m.y - d.y;
-      if (d.mode === 'look') look(dx, dy);
+      if (d.mode === 'drive') drive(dx, dy);
+      else if (d.mode === 'look') look(dx, dy);
       else if (d.mode === 'move') move(d, m.x, m.y, dx, dy);
       else if (pointers.size === 2) {
-        // Two fingers: slide to look around, pinch to fly in or out.
+        // Two fingers: slide to move, pinch to fly in or out.
         transition.current = null;
-        look(dx, dy);
+        move(d, m.x, m.y, dx, dy);
         if (d.spread > 0 && m.spread > 0) {
           const hit = pick(m.x, m.y);
           if (hit) flyToward(hit.point, 1 - d.spread / m.spread);
@@ -320,7 +335,7 @@ export function CameraRig() {
       const d = drag;
       drag = null;
       // A quick left click, no drag: walk there.
-      if (d && !d.moved && d.mode === 'move' && e.button === 0 && performance.now() - d.startTime < 500) goTo(e.clientX, e.clientY);
+      if (d && !d.moved && d.mode === 'drive' && e.button === 0 && performance.now() - d.startTime < 500) goTo(e.clientX, e.clientY);
     };
 
     const onWheel = (e: WheelEvent) => {
